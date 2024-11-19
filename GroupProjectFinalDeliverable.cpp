@@ -10,12 +10,59 @@
 #include <tuple>
 #include <iomanip>
 #include <cstdint>
+#include <regex>
 
 using namespace std;
 
 //Challenge 1 Functions
 
 //Challenge 2 Functions
+bool isValidHex(const std::string& hex)
+{
+    std::regex hexPattern("^[0-9a-fA-F]+$");
+    return regex_match(hex, hexPattern);
+}
+
+std::vector<uint8_t> hexToBytes(const std::string& hex)
+{
+    std::vector<uint8_t> bytes;
+
+    for (size_t i = 0; i < hex.length(); i += 2)
+    {
+        std::string byteString = hex.substr(i, 2);
+        bytes.push_back(stoul(byteString, nullptr, 16));
+    }
+
+    return bytes;
+}
+
+std::string bytesToHex(std::vector<uint8_t> bytes)
+{
+    std::stringstream convert;
+
+    for (int i = 0; i < bytes.size(); i++)
+    {
+        convert << std::hex << int(bytes.at(i));
+    }
+
+    return convert.str();
+}
+
+std::string fixedXOR(const std::string& temp1, const std::string& temp2)
+{
+    std::vector<uint8_t> newtemp1 = hexToBytes(temp1);
+    std::vector<uint8_t> newtemp2 = hexToBytes(temp2);
+
+    std::vector<uint8_t> temp;
+
+    for (int i = 0; i < newtemp1.size(); i++)
+    {
+        temp.push_back(newtemp1.at(i) ^ newtemp2.at(i));
+    }
+
+    return bytesToHex(temp);
+
+}
 
 //Challenge 3 Functions
 
@@ -61,9 +108,35 @@ int main()
             case 1:
                 cout <<  "Challenge 1: Convert hex to base64";
                 break;
+
+            
             case 2:
                 cout << "Challenge 2: Fixed XOR";
+                std::string temp1;
+                std::string temp2;
+                std::cout << "Enter string 1: ";
+                std::cin >> temp1;
+            
+                std::cout << "Enter string 2: ";
+                std::cin >> temp2;
+            
+                while ((temp1.length() != temp2.length()) 
+                        || (temp1.length() == 0 || temp2.length() == 0)
+                        || (!isValidHex(temp1) || !isValidHex(temp2)))
+                {
+                    std::cout << "\nERROR: Invalid strings.\n\n";
+            
+                    std::cout << "Enter string 1: ";
+                    std::cin >> temp1;
+            
+                    std::cout << "Enter string 2: ";
+                    std::cin >> temp2;
+                }
+            
+                std::cout << "\nXOR: " << fixedXOR(temp1, temp2);
                 break;
+
+            
             case 3:
                 cout << "Challenge 3: Single-byte XOR cipher";
                 break;
