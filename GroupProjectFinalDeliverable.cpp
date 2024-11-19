@@ -11,7 +11,9 @@
 #include <iomanip>
 #include <cstdint>
 #include <regex>
-
+#include <stdlib.h> //for Windows
+#include <cstdlib> //for a Mac function
+ 
 using namespace std;
 
 //Challenge 1 Functions
@@ -77,90 +79,125 @@ std::string fixedXOR(const std::string& temp1, const std::string& temp2)
 //Challenge 8 Functions
 
 //Main
-int main() 
+int main()
 {
     cout << "Welcome to the CryptoPals Set 1 Challenges";
+    cout << endl;
+    cout << endl;
 
     int choice = 9;
 
     //while loop for the menu
-    while(choice != 0){
+    while (choice != 0) {
         cout << "Choose your challenge. Enter 1 for challenge 1, 2 for challenge 2,..., 8 for challenge 8";
         cout << "To exit out of the menu, enter 0";
-        cout << "Challenge 1: Convert hex to base64";
-        cout << "Challenge 2: Fixed XOR";
-        cout << "Challenge 3: Single-byte XOR cipher";
-        cout << "Challenge 4: Detect single-character XOR";
-        cout << "Challenge 5: Implement repeating-key XOR";
-        cout << "Challenge 6: Break repeating-key XOR";
-        cout << "Challenge 7: AES in ECB mode";
-        cout << "Challenge 8: Detect AES in ECB mode";
-        cin >> choice; 
+        cout << endl;
+        cout << endl;
+        cout << "Challenge 1: Convert hex to base64"; cout << endl;
+        cout << "Challenge 2: Fixed XOR"; cout << endl;
+        cout << "Challenge 3: Single-byte XOR cipher"; cout << endl;
+        cout << "Challenge 4: Detect single-character XOR"; cout << endl;
+        cout << "Challenge 5: Implement repeating-key XOR"; cout << endl;
+        cout << "Challenge 6: Break repeating-key XOR"; cout << endl;
+        cout << "Challenge 7: AES in ECB mode"; cout << endl;
+        cout << "Challenge 8: Detect AES in ECB mode"; cout << endl;
+        cout << "--: "; cin >> choice;
+
+        //Clear console supported by three different OS.
+        //Just to make things prettier.
+
+        #if __linux__ || __APPLE__
+                system("clear");
+        #elif _WIN32 || _WIN64
+                system("cls");
+        #endif
         
+
         //switch statements to choose each challenge
         /*
-        //While loop for letting the user have multiple attempts with an if statement before the challenge to ask for a hint    
+        //While loop for letting the user have multiple attempts with an if statement before the challenge to ask for a hint
         */
-        switch (choice){
-            case 0:
-                cout << "Now exiting. Goodbye!";
-                break;
-            case 1:
-                cout <<  "Challenge 1: Convert hex to base64";
-                break;
+        switch (choice) {
+        case 0:
+            cout << "Now exiting. Goodbye!";
+            break;
+        case 1:
+            cout << "Challenge 1: Convert hex to base64";
+            break;
 
-            
-            case 2:
-                cout << "Challenge 2: Fixed XOR";
-                std::string temp1;
-                std::string temp2;
+
+        case 2:
+        {
+            cout << "Challenge 2: Fixed XOR";
+            cout << endl;
+            std::string temp1;
+            std::string temp2;
+            std::cout << "Enter string 1: ";
+            std::cin >> temp1;
+
+            std::cout << "Enter string 2: ";
+            std::cin >> temp2;
+
+            while ((temp1.length() != temp2.length())
+                || (temp1.length() == 0 || temp2.length() == 0)
+                || (!isValidHex(temp1) || !isValidHex(temp2)))
+            {
+                std::cout << "\nERROR: Invalid strings.\n\n";
+
                 std::cout << "Enter string 1: ";
                 std::cin >> temp1;
-            
+
                 std::cout << "Enter string 2: ";
                 std::cin >> temp2;
-            
-                while ((temp1.length() != temp2.length()) 
-                        || (temp1.length() == 0 || temp2.length() == 0)
-                        || (!isValidHex(temp1) || !isValidHex(temp2)))
-                {
-                    std::cout << "\nERROR: Invalid strings.\n\n";
-            
-                    std::cout << "Enter string 1: ";
-                    std::cin >> temp1;
-            
-                    std::cout << "Enter string 2: ";
-                    std::cin >> temp2;
-                }
-            
-                std::cout << "\nXOR: " << fixedXOR(temp1, temp2);
-                break;
+            }
 
-            
-            case 3:
-                cout << "Challenge 3: Single-byte XOR cipher";
-                break;
-            case 4:
-                cout << "Challenge 4: Detect single-character XOR";
-                break;
-            case 5:
-                cout << "Challenge 5: Implement repeating-key XOR";
-                break;
-            case 6:
-                cout << "Challenge 6: Break repeating-key XOR";
-                break;
-            case 7:
-                cout << "Challenge 7: AES in ECB mode";
-                break;
-            case 8:
-                cout << "Challenge 8: Detect AES in ECB mode";
-                break;
-            default:
-                cout << "Invalid Input. Please choose a challenge or enter 0 to exit!";
-                break;    
+            std::cout << "\nXOR: " << fixedXOR(temp1, temp2);
         }
+            break;
+
+
+        case 3:
+            cout << "Challenge 3: Single-byte XOR cipher";
+            break;
+        case 4:
+            cout << "Challenge 4: Detect single-character XOR";
+            break;
+        case 5:
+            cout << "Challenge 5: Implement repeating-key XOR";
+            break;
+        case 6:
+            cout << "Challenge 6: Break repeating-key XOR";
+            break;
+        case 7:
+            cout << "Challenge 7: AES in ECB mode";
+            break;
+        case 8:
+            cout << "Challenge 8: Detect AES in ECB mode";
+            break;
+        default:
+            cout << "Invalid Input. Please choose a challenge or enter 0 to exit!";
+            break;
+        }
+
+        cout << endl;
+
+        //Wait for user input to continue to next challenge.
+
+        #if __linux__ || __APPLE__
+                system("read");
+        #elif _WIN32 || _WIN64
+                system("pause");
+        #endif
+
+        //Again, to clear the console after user is ready.
+
+        #if __linux__ || __APPLE__
+                system("clear");
+        #elif _WIN32 || _WIN64
+                system("cls");
+        #endif
     }
-    
+
     return 0;
 }
 
