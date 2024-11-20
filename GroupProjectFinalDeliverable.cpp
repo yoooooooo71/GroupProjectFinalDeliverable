@@ -73,6 +73,181 @@ std::string fixedXOR(const std::string& temp1, const std::string& temp2)
 //Challenge 5 Functions
 
 //Challenge 6 Functions
+// compute hamming distance between 2 strings
+int hamDistance(string a, string b)
+{
+    int count = 0;
+    for (int i = 0; i < a.size(); i++)
+    {
+        //adds integer leaving off least significant byte
+        int byte = (a[i] & 0xFF) ^ (b[i] & 0xFF);
+        while (byte)
+        {
+            count += byte & 1;
+            byte = byte >> 1;
+        }
+    }
+    return count;
+}
+
+string decode_64(const string& in) //function to decode base 64
+{
+    string out;
+    vector<int> T(256, -1);
+    for (int i = 0; i < 64; i++) //base64 characters
+        T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
+
+    int val = 0, //value of decoded bits
+    valb = -8;  //keeps track of how many bits
+    for (unsigned char c : in)
+    {
+        if (T[c] == -1) break;
+        val = (val << 6) + T[c];
+        valb += 6;
+        if (valb >= 0)
+        {
+            out.push_back(char((val >> valb) & 0xFF));
+            valb -= 8;
+        }
+    }
+    return out;
+}
+
+string repeatingKeyXOR(const string& plaintext, const string& key) //repeating key function
+{
+    string ciphertext = "";
+    int keyIndex = 0;
+
+    // loop through each character
+    for (char c : plaintext) {
+        ciphertext += c ^ key[keyIndex]; // XOR character with key character
+        keyIndex = (keyIndex + 1) % key.size();
+    }
+    return ciphertext;
+}
+
+//accepts encoded data
+int getKeyLength(const string& data)
+{
+    int bestKeyLength = 2; //smallest hamming distance
+    double bestScore = 1e9; /*initialize bestcore to very large value to make sure
+                              any avg hamming distance will be smaller than this
+                            */
+    for (int keyLength = 2; keyLength <= 40; keyLength++) //iterate through key length 2-40
+    {
+        double totalDistance = 0;
+        int numComparisons = 0;
+
+        // Breaks data into chunks of keyLength size
+        for (int i = 0; i + 2 * keyLength <= data.size(); i += keyLength) 
+        {
+            string chunk1 = data.substr(i, keyLength);
+            string chunk2 = data.substr(i + keyLength, keyLength);
+            totalDistance += hamDistance(chunk1, chunk2) / (double)keyLength;
+            numComparisons++;
+        }
+        //calculate average normalized hamming distance
+        double avg_hamDistance = totalDistance / numComparisons; 
+
+        if (avg_hamDistance < bestScore) //if keylength has lower avg distance it updates..
+        {                                //..bestkeylength and bestscore
+            bestScore = avg_hamDistance;
+            bestKeyLength = keyLength;
+        }
+    }
+    return bestKeyLength;
+}
+
+string singleByte(string str, char key)
+{
+    string strXOR(str.size(), '\0'); //initialize string
+
+    for (int i = 0; i < str.size(); ++i) //loop goes through each character in str
+    {                                    //does xor operation and stores it in strXor
+        strXOR[i] = str[i] ^ key;
+    }
+    return strXOR;
+}
+
+char findKey(string cipherBlock)
+{   
+    int max = 0;
+    char key = 0;
+    string dataDecoded;
+
+    for (int i = 0; i <= 256; i++) //loop through 256 possibilities
+    {
+        char ch = (char)i;
+        string attempt = singleByte(cipherBlock, ch); //single byte xor
+
+        int count = 0;
+        //finds characters and increments
+        for (int j = 0; j < attempt.size(); j++)
+        {
+            if ((attempt[j] >= 65 && attempt[j] <= 122) || attempt[j] == ' ')
+            {
+                count++;
+            }
+        }
+        //highest count is the key
+        if (count > max)
+        {
+            max = count;
+            key = ch;
+        }
+    }
+    return key;
+}
+
+int mainFunction()
+{
+    string key;
+    string filename = "6.txt"; //file to decode
+    ifstream infile(filename);
+    if (!infile.is_open())
+    {
+        cout << "Error: Unable to open file " << filename << endl;
+        return 1;
+    }
+
+    string line;
+    string data;
+
+    // Read each line of file
+    while (getline(infile, line))
+    {
+        // Append each line to the encrypted data
+        data += line;
+    }
+    infile.close();
+
+    string decoded_data = decode_64(data); //decode file
+    int keyLength = getKeyLength(decoded_data); //find key length of decoded data
+    cout << "Key length: " << keyLength << endl;
+   
+    int blocks = decoded_data.size() / keyLength;
+
+    //transpose blocks 
+    for (int i = 0; i < keyLength; ++i) 
+    {
+        string block;
+        char indexKey = '/0';
+
+        for (int j = 0; j < blocks; j++) 
+        {
+            block += decoded_data.substr((j * keyLength) + i, 1);
+        }
+        //puts together characters to make the key
+        key += findKey(block);
+    }
+    cout << "KEY: " << key << endl;
+    string decrypted_data = repeatingKeyXOR(decoded_data, key); //use repeating key xor to decrypt the string
+
+    // Output the decrypted data
+    cout << "Decrypted File:\n" << decrypted_data << endl;
+
+    return 0;
+}
 
 //Challenge 7 Functions
 
