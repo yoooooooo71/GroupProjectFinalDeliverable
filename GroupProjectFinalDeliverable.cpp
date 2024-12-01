@@ -17,6 +17,60 @@
 using namespace std;
 
 //Challenge 1 Functions
+// Code set to convert hex number to base64
+string hexToBase64(const string& hex)
+{
+    vector<uint8_t> bytes;
+    // Note: uint8_t splits the hex string into unsigned 8-bit integers
+
+    // Create variables
+    string base64;
+    int hexBits = 0;
+    int bits = 0;
+
+    // Creating the Base64 encoding table
+    const string base64Table =
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
+
+    // Convert hex string to bytes
+    // Loops through the hex number and converts the hex string to the bytes vector
+    for (size_t i = 0; i < hex.length(); i += 2)
+    {
+        string byteString = hex.substr(i, 2);
+        bytes.push_back(stoul(byteString, nullptr, 16));
+    }
+    // Encode bytes to Base64
+    for (uint8_t byte : bytes)
+    {
+        hexBits = (hexBits << 8) | byte;
+        bits += 8;
+
+        while (bits >= 6)
+        {
+            base64 += base64Table[(hexBits >> (bits - 6)) & 0x3F];
+            bits -= 6;
+        }
+    }
+    // Shift for accurate conversion
+    if (bits > 0)
+    {
+        hexBits <<= (6 - bits);
+        base64 += base64Table[hexBits & 0x3F];
+    }
+    // Verify length is a multiple of 4
+    while (base64.length() % 4 != 0)
+    {
+        base64 += "=";
+    }
+    return base64;
+}
+
+// Function to validate hexadecimal input
+bool isValidHex(const string& hex)
+{
+    regex hexPattern("^[0-9a-fA-F]+$");
+    return regex_match(hex, hexPattern);
+}
 
 //Challenge 2 Functions
 bool isValidHex(const std::string& hex)
@@ -123,7 +177,30 @@ int main()
             break;
         case 1:
             cout << "Challenge 1: Convert hex to base64";
-            break;
+               //Request hex number
+              string hexInput;
+              while (true)
+              {
+              // Request hex number
+              cout << "Enter a hexadecimal number: ";
+              cin >> hexInput;
+              // Validate input
+              if (isValidHex(hexInput))
+              {
+                  break;
+              }
+              else
+              {
+                  cout << "Error: Invalid hexadecimal input." << endl;
+              }
+              }
+          
+              // Show the input and output
+              cout << "Hex input: " << hexInput << endl;
+              cout << "Base64 output: " << hexToBase64(hexInput) << endl;
+          
+              return 0;
+                 break;
 
 
         case 2:
