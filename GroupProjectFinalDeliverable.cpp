@@ -1,5 +1,13 @@
-// GroupProjectFinalDeliverable.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+/*
+CSC 414 Intro to Software Engineering H001
+Group 3 Project
+
+Solving CryptoPals Crypto Challenge
+
+Group Members: Michael Brown, Chance Davis,
+    Kristen Gilmer, Rubina Guragain, Patrick Heard,
+    Feizal Mjidho, Railyn Wingfield
+*/
 
 #include <iostream>
 #include <vector>
@@ -63,13 +71,6 @@ string hexToBase64(const string& hex)
         base64 += "=";
     }
     return base64;
-}
-
-// Function to validate hexadecimal input
-bool isValidHex(const string& hex)
-{
-    regex hexPattern("^[0-9a-fA-F]+$");
-    return regex_match(hex, hexPattern);
 }
 
 //Challenge 2 Functions
@@ -176,32 +177,33 @@ int main()
             cout << "Now exiting. Goodbye!";
             break;
         case 1:
+        {
             cout << "Challenge 1: Convert hex to base64";
-               //Request hex number
-              string hexInput;
-              while (true)
-              {
-              // Request hex number
-              cout << "Enter a hexadecimal number: ";
-              cin >> hexInput;
-              // Validate input
-              if (isValidHex(hexInput))
-              {
-                  break;
-              }
-              else
-              {
-                  cout << "Error: Invalid hexadecimal input." << endl;
-              }
-              }
-          
-              // Show the input and output
-              cout << "Hex input: " << hexInput << endl;
-              cout << "Base64 output: " << hexToBase64(hexInput) << endl;
-          
-              return 0;
-                 break;
+            //Request hex number
+            string hexInput;
+            while (true)
+            {
+                // Request hex number
+                cout << "Enter a hexadecimal number: ";
+                cin >> hexInput;
+                // Validate input
+                if (isValidHex(hexInput))
+                {
+                    break;
+                }
+                else
+                {
+                    cout << "Error: Invalid hexadecimal input." << endl;
+                }
+            }
 
+            // Show the input and output
+            cout << "Hex input: " << hexInput << endl;
+            cout << "Base64 output: " << hexToBase64(hexInput) << endl;
+
+            return 0;
+            break;
+        }
 
         case 2:
         {
