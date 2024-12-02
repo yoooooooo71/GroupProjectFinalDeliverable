@@ -21,6 +21,8 @@ Group Members: Michael Brown, Chance Davis,
 #include <regex>
 #include <stdlib.h> //for Windows
 #include <cstdlib> //for a Mac function
+#include <unordered_set>
+#include <algorithm>
  
 using namespace std;
 
@@ -228,7 +230,7 @@ void printDecodedString(string fileName) {
 //Challenge 8 Functions
 
 int hasDuplicateBlocks(const vector<uint8_t>& bytes, size_t blockSize) {
-    unordered_set<string> blocks;
+    unordered_set<string>blocks;
     int dupes = 0;
     for (size_t i = 0; i < bytes.size(); i += blockSize) {
         string block(bytes.begin() + i, bytes.begin() + i + blockSize);
@@ -283,122 +285,129 @@ int main()
         /*
         //While loop for letting the user have multiple attempts with an if statement before the challenge to ask for a hint
         */
-        switch (choice) {
-        case 0:
-            cout << "Now exiting. Goodbye!";
-            break;
-        case 1:
-        {
-            cout << "Challenge 1: Convert hex to base64";
-            //Request hex number
-            string hexInput;
-            while (true)
-            {
-                // Request hex number
-                cout << "Enter a hexadecimal number: ";
-                cin >> hexInput;
-                // Validate input
-                if (isValidHex(hexInput))
+                switch (choice) {
+                case 0:
+                    cout << "Now exiting. Goodbye!";
+                    break;
+                case 1:
                 {
+                    cout << "Challenge 1: Convert hex to base64";
+                    //Request hex number
+                    string hexInput;
+                    while (true)
+                    {
+                        // Request hex number
+                        cout << "Enter a hexadecimal number: ";
+                        cin >> hexInput;
+                        // Validate input
+                        if (isValidHex(hexInput))
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            cout << "Error: Invalid hexadecimal input." << endl;
+                        }
+                    }
+
+                    // Show the input and output
+                    cout << "Hex input: " << hexInput << endl;
+                    cout << "Base64 output: " << hexToBase64(hexInput) << endl;
+
+                    return 0;
                     break;
                 }
-                else
+
+                case 2:
                 {
-                    cout << "Error: Invalid hexadecimal input." << endl;
+                    cout << "Challenge 2: Fixed XOR";
+                    cout << endl;
+                    std::string temp1;
+                    std::string temp2;
+                    std::cout << "Enter string 1: ";
+                    std::cin >> temp1;
+
+                    std::cout << "Enter string 2: ";
+                    std::cin >> temp2;
+
+                    while ((temp1.length() != temp2.length())
+                        || (temp1.length() == 0 || temp2.length() == 0)
+                        || (!isValidHex(temp1) || !isValidHex(temp2)))
+                    {
+                        std::cout << "\nERROR: Invalid strings.\n\n";
+
+                        std::cout << "Enter string 1: ";
+                        std::cin >> temp1;
+
+                        std::cout << "Enter string 2: ";
+                        std::cin >> temp2;
+                    }
+
+                    std::cout << "\nXOR: " << fixedXOR(temp1, temp2);
                 }
-            }
-
-            // Show the input and output
-            cout << "Hex input: " << hexInput << endl;
-            cout << "Base64 output: " << hexToBase64(hexInput) << endl;
-
-            return 0;
-            break;
-        }
-
-        case 2:
-        {
-            cout << "Challenge 2: Fixed XOR";
-            cout << endl;
-            std::string temp1;
-            std::string temp2;
-            std::cout << "Enter string 1: ";
-            std::cin >> temp1;
-
-            std::cout << "Enter string 2: ";
-            std::cin >> temp2;
-
-            while ((temp1.length() != temp2.length())
-                || (temp1.length() == 0 || temp2.length() == 0)
-                || (!isValidHex(temp1) || !isValidHex(temp2)))
-            {
-                std::cout << "\nERROR: Invalid strings.\n\n";
-
-                std::cout << "Enter string 1: ";
-                std::cin >> temp1;
-
-                std::cout << "Enter string 2: ";
-                std::cin >> temp2;
-            }
-
-            std::cout << "\nXOR: " << fixedXOR(temp1, temp2);
-        }
-            break;
+                break;
 
 
-        case 3:
-            cout << "Challenge 3: Single-byte XOR cipher" << endl;
-            string cipherText;
-            cout << "Enter the encrypted string: ";
-            cin >> cipherText;
-            cout << endl;
-            cout << "Cracking the cipher (this may take a minute):  " << endl;
-            frequencies = getFrequencies("Challenge3Text.txt");
-            tuple<unsigned char, float, string> key = crackCipher(cipherText);
-            cout << "Key: " << get<0>(key) << "\nMessage: " << get<2>(key) << endl;
-            break;
-
-        case 4:
-            cout << "Challenge 4: Detect single-character XOR" << endl;
-            cout << "Cracking the cipher (this may take a minute):  " << endl;
-            frequencies = getFrequencies("Challenge3Text.txt");
-            printDecodedString("Challenge4Text.txt");
-            break;
-
-        case 5:
-            cout << "Challenge 5: Implement repeating-key XOR";
-            break;
-        case 6:
-            cout << "Challenge 6: Break repeating-key XOR";
-            break;
-        case 7:
-            cout << "Challenge 7: AES in ECB mode";
-            break;
-
-        case 8:
-            cout << "Challenge 8: Detect AES in ECB mode";
-            ifstream file("Challenge8Text.txt");
-            if (!file.is_open()) {
-                cerr << "Failed to open Challenge8Text.txt" << endl;
-                return 1;
-            }
-
-            string line;
-            size_t blockSize = 16; // AES block size in bytes
-            int lineNum = 0;
-
-            while (getline(file, line)) {
-                lineNum++;
-                vector<uint8_t> bytes = hexToBytes(line);
-                int dupes = hasDuplicateBlocks(bytes, blockSize);
-                if (dupes) {
-                    cout << "Detected ECB mode in line: " << lineNum << " containing " << dupes << " duplicates." << endl;
+                case 3:
+                {
+                    cout << "Challenge 3: Single-byte XOR cipher" << endl;
+                    string cipherText;
+                    cout << "Enter the encrypted string: ";
+                    cin >> cipherText;
+                    cout << endl;
+                    cout << "Cracking the cipher (this may take a minute):  " << endl;
+                    frequencies = getFrequencies("Challenge3Text.txt");
+                    tuple<unsigned char, float, string> key = crackCipher(cipherText);
+                    cout << "Key: " << get<0>(key) << "\nMessage: " << get<2>(key) << endl;
                     break;
                 }
-            }
 
-            file.close();
-            break;
+                case 4:
+                {
+                    cout << "Challenge 4: Detect single-character XOR" << endl;
+                    cout << "Cracking the cipher (this may take a minute):  " << endl;
+                    frequencies = getFrequencies("Challenge3Text.txt");
+                    printDecodedString("Challenge4Text.txt");
+                    break;
+                }
+
+                case 5:
+                    cout << "Challenge 5: Implement repeating-key XOR";
+                    break;
+                case 6:
+                    cout << "Challenge 6: Break repeating-key XOR";
+                    break;
+                case 7:
+                    cout << "Challenge 7: AES in ECB mode";
+                    break;
+
+                case 8:
+                {
+                    cout << "Challenge 8: Detect AES in ECB mode";
+                    ifstream file("Challenge8Text.txt");
+                    if (!file.is_open()) {
+                        cerr << "Failed to open Challenge8Text.txt" << endl;
+                        return 1;
+                    }
+
+                    string line;
+                    size_t blockSize = 16; // AES block size in bytes
+                    int lineNum = 0;
+
+                    while (getline(file, line)) {
+                        lineNum++;
+                        vector<uint8_t> bytes = hexToBytes(line);
+                        int dupes = hasDuplicateBlocks(bytes, blockSize);
+                        if (dupes) {
+                            cout << "Detected ECB mode in line: " << lineNum << " containing " << dupes << " duplicates." << endl;
+                            break;
+                        }
+                    }
+                
+
+                file.close();
+                break;
+                }
         default:
             cout << "Invalid Input. Please choose a challenge or enter 0 to exit!";
             break;
