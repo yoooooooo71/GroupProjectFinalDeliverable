@@ -123,7 +123,101 @@ std::string fixedXOR(const std::string& temp1, const std::string& temp2)
 
 //Challenge 3 Functions
 
+vector<tuple < char, float> > frequencies; // A global variable to keep track of the average expect frequency of each character
+
+/*
+    Reads a text file of a book determine the average expected frequency of occurance for each character that is considered
+*/
+vector <tuple <char, float> > getFrequencies(string fileName) {
+    vector <tuple <char, float>> frequencies;
+    for (char letter = 32; letter < 127; letter++) {
+        ifstream file(fileName);
+        char c; //Specific character within the text file
+        float length = 0; // total number of characters in the text file
+        float total = 0; // total occurances of 'letter' within the text document
+        float freq; // calculated frequency of 'letter' in the text document
+        while (file.get(c)) {
+            length++; // adding 1 for each character that is seen
+            if (letter == c)
+                total++; // adding 1 for each time 'letter' appears in the text document
+        }
+        freq = total / length;
+        frequencies.push_back(make_tuple(letter, freq)); // Pushing the letter and frequency to the frequency vector for later reference
+        file.close(); // closing the file to be opened again in the next loop
+    }
+    return frequencies;
+}
+
+/*
+    Takes a string and gives it a score based on how often each character within it appears.
+    The lower the score, the less likely it is to consist of random characters.
+*/
+float textScore(string text) {
+    float score = 0; // score of the string
+    float length = text.length();
+
+    // Traversing through each character within the frequency vector
+    for (tuple <char, float> letter : frequencies) {
+        float total = 0; // total number of times that the letter appears in the string
+        for (char c : text) {
+            if (c == get<0>(letter))
+                total++; // adds one each time the specified charecter in the frequency vector appears in the string
+        }
+        float frequency = total / length;
+        float error = abs(frequency - get<1>(letter)); // takes the calculated frequcny of the character int he string and compares it to the expected frequency from the text document
+        score += error;
+
+    }
+    return score;
+}
+
+/*
+    Takes an encoded string in hexadecimal format and returns the key character, the score and the decoded message as a tuple
+*/
+tuple<unsigned char, float, string> crackCipher(string text) {
+    vector<uint8_t> rawBytes = hexToBytes(text); // converts the string into bytes
+    tuple <unsigned char, float, string> best = make_tuple(255, 999, ""); // creates an arbitrary best guess to start
+
+    // tring out different characters starting at the SPACE character and ending at the ~ character
+    for (unsigned char i = 32; i < 127; i++) {
+        string plainText = ""; // an empty string to hold the decoded message
+
+        // looping through each byte of the vector
+        for (int j = 0; j < rawBytes.size(); j++)
+        {
+            plainText += i ^ rawBytes[j]; // trying to decode the raw bytes with a character and adding it to plainText
+        }
+        float score = textScore(plainText); // getting the score for the message
+
+        best = (get<1>(best) < score) ? best : make_tuple(i, score, plainText); // seeing if the calcualted score is the best score
+    }
+    return best;
+}
+
+
+
+
 //Challenge 4 Functions
+
+vector <tuple <unsigned char, float, string>> scoreString(string fileName) {
+    ifstream file(fileName);
+    string line = "";
+    vector<tuple<unsigned char, float, string>> output;
+    while (getline(file, line)) {
+        output.push_back(crackCipher(line));
+    }
+    return output;
+}
+
+
+void printDecodedString(string fileName) {
+    vector<tuple<unsigned char, float, string>> messages = scoreString(fileName);
+    tuple<unsigned char, float, string> best = make_tuple(255, 999, "");
+    for (tuple<unsigned char, float, string> message : messages) {
+        best = (get<1>(best) < get<1>(message)) ? best : message;
+    }
+    cout << get<0>(best) << " : " << get<2>(best) << endl;
+}
 
 //Challenge 5 Functions
 
@@ -132,6 +226,23 @@ std::string fixedXOR(const std::string& temp1, const std::string& temp2)
 //Challenge 7 Functions
 
 //Challenge 8 Functions
+
+int hasDuplicateBlocks(const vector<uint8_t>& bytes, size_t blockSize) {
+    unordered_set<string> blocks;
+    int dupes = 0;
+    for (size_t i = 0; i < bytes.size(); i += blockSize) {
+        string block(bytes.begin() + i, bytes.begin() + i + blockSize);
+        if (blocks.find(block) != blocks.end()) {
+            dupes++;
+        }
+        blocks.insert(block);
+    }
+  
+    return dupes;
+}
+
+
+
 
 //Main
 int main()
@@ -236,11 +347,24 @@ int main()
 
 
         case 3:
-            cout << "Challenge 3: Single-byte XOR cipher";
+            cout << "Challenge 3: Single-byte XOR cipher" << endl;
+            string cipherText;
+            cout << "Enter the encrypted string: ";
+            cin >> cipherText;
+            cout << endl;
+            cout << "Cracking the cipher (this may take a minute):  " << endl;
+            frequencies = getFrequencies("Challenge3Text.txt");
+            tuple<unsigned char, float, string> key = crackCipher(cipherText);
+            cout << "Key: " << get<0>(key) << "\nMessage: " << get<2>(key) << endl;
             break;
+
         case 4:
-            cout << "Challenge 4: Detect single-character XOR";
+            cout << "Challenge 4: Detect single-character XOR" << endl;
+            cout << "Cracking the cipher (this may take a minute):  " << endl;
+            frequencies = getFrequencies("Challenge3Text.txt");
+            printDecodedString("Challenge4Text.txt");
             break;
+
         case 5:
             cout << "Challenge 5: Implement repeating-key XOR";
             break;
@@ -250,8 +374,30 @@ int main()
         case 7:
             cout << "Challenge 7: AES in ECB mode";
             break;
+
         case 8:
             cout << "Challenge 8: Detect AES in ECB mode";
+            ifstream file("Challenge8Text.txt");
+            if (!file.is_open()) {
+                cerr << "Failed to open Challenge8Text.txt" << endl;
+                return 1;
+            }
+
+            string line;
+            size_t blockSize = 16; // AES block size in bytes
+            int lineNum = 0;
+
+            while (getline(file, line)) {
+                lineNum++;
+                vector<uint8_t> bytes = hexToBytes(line);
+                int dupes = hasDuplicateBlocks(bytes, blockSize);
+                if (dupes) {
+                    cout << "Detected ECB mode in line: " << lineNum << " containing " << dupes << " duplicates." << endl;
+                    break;
+                }
+            }
+
+            file.close();
             break;
         default:
             cout << "Invalid Input. Please choose a challenge or enter 0 to exit!";
