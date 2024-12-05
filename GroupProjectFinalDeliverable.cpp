@@ -351,56 +351,6 @@ char findKey(string cipherBlock)
     return key;
 }
 
-int printFile()
-{
-    string key;
-    string filename = "Challenge6Text.txt"; //file to decode
-    ifstream infile(filename);
-    if (!infile.is_open())
-    {
-        cout << "Error: Unable to open file " << filename << endl;
-        return 1;
-    }
-
-    string line;
-    string data;
-
-    // Read each line of file
-    while (getline(infile, line))
-    {
-        // Append each line to the encrypted data
-        data += line;
-    }
-    infile.close();
-
-    string decoded_data = decode_64(data); //decode file
-    int keyLength = getKeyLength(decoded_data); //find key length of decoded data
-    cout << "Key length: " << keyLength << endl;
-   
-    int blocks = decoded_data.size() / keyLength;
-
-    //transpose blocks 
-    for (int i = 0; i < keyLength; ++i) 
-    {
-        string block;
-        char indexKey = '/0';
-
-        for (int j = 0; j < blocks; j++) 
-        {
-            block += decoded_data.substr((j * keyLength) + i, 1);
-        }
-        //puts together characters to make the key
-        key += findKey(block);
-    }
-    cout << "KEY: " << key << endl;
-    string decrypted_data = repeatingKeyXOR(decoded_data, key); //use repeating key xor to decrypt the string
-
-    // Output the decrypted data
-    cout << "Decrypted File:\n" << decrypted_data << endl;
-
-    return 0;
-}
-
 //Challenge 7 Functions
 
 //Challenge 8 Functions
@@ -551,8 +501,56 @@ int main()
                     cout << "Challenge 5: Implement repeating-key XOR";
                     break;
                 case 6:
+                {
                     cout << "Challenge 6: Break repeating-key XOR";
+                    
+                    string key;
+                    string filename = "Challenge6Text.txt"; //file to decode
+                    ifstream infile(filename);
+                    if (!infile.is_open())
+                    {
+                      cout << "Error: Unable to open file " << filename << endl;
+                      return 1;
+                    }
+
+                    string line;
+                    string data;
+
+                    // Read each line of file
+                    while (getline(infile, line))
+                    {
+                       // Append each line to the encrypted data
+                       data += line;
+                    }
+                       infile.close();
+
+                    string decoded_data = decode_64(data); //decode file
+                    int keyLength = getKeyLength(decoded_data); //find key length of decoded data
+                    cout << "Key length: " << keyLength << endl;
+   
+                    int blocks = decoded_data.size() / keyLength;
+
+                    //transpose blocks 
+                    for (int i = 0; i < keyLength; ++i) 
+                    {
+                        string block;
+                        char indexKey = '/0';
+
+                        for (int j = 0; j < blocks; j++) 
+                        {
+                          block += decoded_data.substr((j * keyLength) + i, 1);
+                        }
+                       //puts together characters to make the key
+                       key += findKey(block);
+                    }
+                    cout << "KEY: " << key << endl;
+                    string decrypted_data = repeatingKeyXOR(decoded_data, key); //use repeating key xor to decrypt the string
+
+                    // Output the decrypted data
+                    cout << "Decrypted File:\n" << decrypted_data << endl;
+                }
                     break;
+                    
                 case 7:
                     cout << "Challenge 7: AES in ECB mode";
                     break;
