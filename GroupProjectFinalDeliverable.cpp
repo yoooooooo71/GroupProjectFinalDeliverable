@@ -226,6 +226,32 @@ void printDecodedString(string fileName) {
 
 //Challenge 5 Functions
 
+// Encrypts with repeating key XOR
+void repeatingKeyXor(const char* plaintext, const char* key, char* ciphertext) {
+    size_t keyLength = strlen(key);
+    size_t plaintextLength = strlen(plaintext);
+
+    // Iterate over each character in the plaintext
+    for (size_t i = 0; i < plaintextLength; ++i) {
+        ciphertext[i] = plaintext[i] ^ key[i % keyLength];  // XOR with repeating key
+    }
+
+    // Null-terminate the ciphertext
+    ciphertext[plaintextLength] = '\0';
+}
+
+// Converts the encrypted string to hex
+void hexEncode(const char* input, char* output) {
+    static const char* const lut = "0123456789abcdef";
+
+    // Loop through each character in the input string
+    for (int i = 0; input[i] != '\0'; i++) {
+        output[i * 2] = lut[(input[i] & 0xF0) >> 4]; // Appends higher 4 bits
+        output[i * 2 + 1] = lut[(input[i] & 0x0F)];  // Appends lower 4 bits
+    }
+    output[strlen(input) * 2] = '\0'; // Null-terminate hex output
+}
+
 //Challenge 6 Functions
 
 // compute hamming distance between 2 strings
@@ -503,7 +529,44 @@ int main()
                 }
 
                 case 5:
-                    cout << "Challenge 5: Implement repeating-key XOR";
+                    {
+                        // Allows the input of multiple lines
+                        std::string plaintext;
+                        std::string key = "ICE";
+                        std::string line;
+    
+                        std::cout << "Challenge 5: Implement repeating-key XOR \nEnter the plaintext (type 'END' on a new line to finish):\n";
+    
+                        // Clear the input buffer before using getline
+                        std::cin.ignore();  // Ignore any leftover newlines in the buffer
+
+                        // Reads the input line by line
+                        while (true) {
+                            std::getline(std::cin, line);  // Read a line
+                            // Once END is typed the loop is broken
+                            if (line == "END") {
+                                break;
+                            }
+
+                            // Append the line to the plaintext string
+                            plaintext += line + "\n"; // Adds a newline between the lines
+                        }
+
+                        // Remove the last newline character if it exists
+                        if (!plaintext.empty() && plaintext[plaintext.size() - 1] == '\n') {
+                            plaintext.pop_back();
+                        }
+  
+                        const char* plaintextCStr = plaintext.c_str();
+
+                        char ciphertext[3000];
+                        char hexCiphertext[6000];
+
+                        repeatingKeyXor(plaintextCStr, key.c_str(), ciphertext); // Encrypt text
+                        hexEncode(ciphertext, hexCiphertext); // Convert to hex
+
+                        printf("Repeating Key XOR Encryption:\n%s\n", hexCiphertext);
+                    }
                     break;
                 case 6:
                 {
