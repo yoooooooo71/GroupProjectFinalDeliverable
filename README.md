@@ -12,10 +12,11 @@ To run the project, simply clone the project. All files required are attached an
 Those are the only input that is needed; the text for the remaining challenges are in attached files.
 
 Contributors: 
-  Patrick Heard
-  Chance Davis
-  Feizal Mjidho
-  Kristen Gilmer
-  Michael Brown
-  Railyn Wingfield
-  Rubina Guragain
+  Patrick Heard,
+  Chance Davis,
+  Feizal Mjidho,
+  Kristen Gilmer,
+  Michael Brown,
+  Railyn Wingfield,
+  Rubina Guragain,
+Note: Not everyone had to merge a challenge as a few of us worked together on some of the challenges, so those challenges were merged in by one of the contributors. Everyone did their part on completing challenges though.
