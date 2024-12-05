@@ -439,8 +439,7 @@ int main()
                     // Show the input and output
                     cout << "Hex input: " << hexInput << endl;
                     cout << "Base64 output: " << hexToBase64(hexInput) << endl;
-
-                    return 0;
+                   
                     break;
                 }
 
