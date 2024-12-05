@@ -20,3 +20,5 @@ Contributors:  <br />
   Railyn Wingfield, <br />
   Rubina Guragain, <br /> <br />
 Note: Not everyone had to merge a challenge as a few of us worked together on some of the challenges, so those challenges were merged in by one of the contributors. Everyone did their part on completing challenges though.
+For example Feizal assisted Rubina with challenges 3 and 4, which Rubina merged onto the GUI along with challenge 8. Feizal also created the first version of the GUI that was then refined and used to merge all the challenge code.
+
